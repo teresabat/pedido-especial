@@ -1,24 +1,174 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pedido Especial</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pedido Especial</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: rgb(36, 35, 35);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 10;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 30px;
+      color: #b3b3b3;
+    }
+
+    .options {
+      display: flex;
+      gap: 30px;
+      font-size: 1.5em;
+    }
+
+    label {
+      cursor: pointer;
+      position: relative;
+      color: white;
+    }
+
+    #cat-gif {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 5;
+    }
+
+    .heart {
+      position: fixed;
+      bottom: 0;
+      width: 20px;
+      height: 20px;
+      background: red;
+      transform: rotate(45deg);
+      animation: float 2s ease-out forwards;
+      z-index: 999;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: red;
+      border-radius: 50%;
+    }
+
+    .heart::before {
+      top: -10px;
+      left: 0;
+    }
+
+    .heart::after {
+      top: 0;
+      left: -10px;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-600px) scale(1.5);
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Quer namorar comigo?</h1>
-        <div class="options">
-            <label>
-                <input type="checkbox" id="yes">
-            </label>
-            <label id="no-label">
-                <input type="checkbox" id="no">
-            </label>
-        </div>
-        <img id="cat-gif" src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif" alt="cat gif">
+  <div class="container">
+    <h1 id="title">Quer namorar comigo?</h1>
+    <div class="options">
+      <label>
+        <input type="checkbox" id="yes"> Sim
+      </label>
+      <label id="no-label">
+        <input type="checkbox" id="no"> Não
+      </label>
     </div>
+    <img id="cat-gif" src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif" alt="cat gif">
+  </div>
+
+  <script>
+    const yesCheckbox = document.getElementById('yes');
+    const noLabel = document.getElementById('no-label');
+    const noCheckbox = document.getElementById('no');
+    const catGif = document.getElementById('cat-gif');
+    const title = document.getElementById('title');
+
+    function enviarEmail(resposta) {
+      fetch('send_email.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `resposta=${encodeURIComponent(resposta)}`
+      });
+    }
+
+    yesCheckbox.addEventListener('change', () => {
+      if (yesCheckbox.checked) {
+        enviarEmail('sim');
+
+        catGif.style.display = 'block';
+        title.style.display = 'none';
+
+        for (let i = 0; i < 50; i++) {
+          const heart = document.createElement('div');
+          heart.className = 'heart';
+          heart.style.left = Math.random() * window.innerWidth + 'px';
+          document.body.appendChild(heart);
+          setTimeout(() => heart.remove(), 2000);
+        }
+      } else {
+        catGif.style.display = 'none';
+        title.style.display = 'block';
+      }
+    });
+
+    noCheckbox.addEventListener('change', () => {
+      if (noCheckbox.checked) {
+        enviarEmail('não');
+      }
+    });
+
+    noLabel.addEventListener('mouseenter', moveNoLabel);
+    noLabel.addEventListener('touchstart', moveNoLabel);
+
+    function moveNoLabel() {
+      const x = Math.random() * (window.innerWidth - 100);
+      const y = Math.random() * (window.innerHeight - 50);
+      noLabel.style.position = 'absolute';
+      noLabel.style.left = `${x}px`;
+      noLabel.style.top = `${y}px`;
+    }
+  </script>
 </body>
 </html>
